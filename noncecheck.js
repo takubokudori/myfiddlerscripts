@@ -217,30 +217,45 @@ class Handlers
             oSession.responseCode = 304;
             oSession["ui-backcolor"] = "Lavender";
         }
+        
+        //MessageBox.Show(oSession.url);
+        //MessageBox.Show(oSession.fullUrl);
+        //MessageBox.Show(oSession.host);
+        //MessageBox.Show(oSession.hostname);
+        //MessageBox.Show(oSession.PathAndQuery);
+        
+        // hide image files & js files
+        var ext = separate(separate(oSession.PathAndQuery,"?",false)[0],".",true)[1];
+        //MessageBox.Show(ext);
+        if(ext != ""){
+            if(isIncludingInArray(ext,["jpg","jpeg","gif","png","bmp","svg","ico","js","css"])){
+                oSession["ui-hide"]="a";
+            }
+        }
+        // search
         var reqh=oSession.oRequest.headers.ToString(true,true,true);
         var reqb=oSession.GetRequestBodyAsString();
-        if(search(reqh,reqb,["nonce","security"])){
+        if(search(reqh,reqb,["nonce","security","_inline_edit"])){
             oSession["ui-backcolor"] = "Orange";
         }
-        /*
-        var body: String = oSession.GetRequestBodyAsString();
-        if(body!=""){
-            var array: String[]  = body.Split("&");
-
-            var ret: System.Text.StringBuilder = new System.Text.StringBuilder();
-            array.
-            for(var i=0;i<array.length;i++){
-                var x: String[] = array[i].Split("=");
-                if(x.length==1){
-                    ret.Append("Name:"+x[0]+"\nValue: undefined\n\n");
-                }else if(x.length>=2){
-                    ret.Append("Name:"+x[0]+"\nValue: "+x[1]+"\n\n");
-                }
-            }
-            MessageBox.Show(ret);
-        }
-        */
     }
+        
+    static function separate(str: String, delimiter,fromLast: Boolean) {
+        const idx = (fromLast ? str.LastIndexOf(delimiter) : str.IndexOf(delimiter));
+        if(idx==-1){
+            return [str,""];
+        }
+        return [str.substring(0, idx), str.slice(idx + delimiter.length)];
+    }
+        
+    static function isIncludingInArray(str: String, arr:String[]){
+            str=str.ToLower();
+        for(var i=0;i<arr.length;i++){
+            if(str==arr[i]) return true;
+        }
+        return false;
+    }
+
 
     // This function is called immediately after a set of request headers has
     // been read from the client. This is typically too early to do much useful
@@ -339,7 +354,9 @@ class Handlers
         var ret = body.Split("&");
         var a = [ret.length];
         for(var i: int = 0;i < ret.length;i++){
-            a[i] = ret[i].Split("=");
+            var q = ret[i].Split("=");
+            if(ret.length == 1) a[i] = [q[0],""];
+            else a[i] = q;
         }
         return a;
     }
