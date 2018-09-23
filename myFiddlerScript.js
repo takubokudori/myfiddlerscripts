@@ -108,7 +108,7 @@ class Handlers
     RulesStringValue(1,"js","js")
     RulesStringValue(2,"css","css")
     RulesStringValue(3,"picture and js and css","jpg,jpeg,gif,png,bmp,svg,ico,js,css")
-    RulesStringValue(4,"Custom","%CUSTOM%")
+    RulesStringValue(4,"Custom(Comma separated)","%CUSTOM%")
     public static var sHideExtension: String = null;
             
     // Cause Fiddler to override the User-Agent header with one of the defined values
