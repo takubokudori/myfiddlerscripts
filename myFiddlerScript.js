@@ -2,80 +2,8 @@ import System;
 import System.Windows.Forms;
 import Fiddler;
 
-// INTRODUCTION
-//
-// Well, hello there!
-//
-// Don't be scared! :-)
-//
-// This is the FiddlerScript Rules file, which creates some of the menu commands and
-// other features of Fiddler. You can edit this file to modify or add new commands.
-//
-// The original version of this file is named SampleRules.js and it is in the
-// \Program Files\Fiddler\ folder. When Fiddler first runs, it creates a copy named
-// CustomRules.js inside your \Documents\Fiddler2\Scripts folder. If you make a 
-// mistake in editing this file, simply delete the CustomRules.js file and restart
-// Fiddler. A fresh copy of the default rules will be created from the original
-// sample rules file.
-
-// The best way to edit this file is to install the FiddlerScript Editor, part of
-// the free SyntaxEditing addons. Get it here: http://fiddler2.com/r/?SYNTAXVIEWINSTALL
-
-// GLOBALIZATION NOTE: Save this file using UTF-8 Encoding.
-
-// JScript.NET Reference
-// http://fiddler2.com/r/?msdnjsnet
-//
-// FiddlerScript Reference
-// http://fiddler2.com/r/?fiddlerscriptcookbook
-
 class Handlers
 {
-    // *****************
-    //
-    // This is the Handlers class. Pretty much everything you ever add to FiddlerScript
-    // belongs right inside here, or inside one of the already-existing functions below.
-    //
-    // *****************
-
-    // The following snippet demonstrates a custom-bound column for the Web Sessions list.
-    // See http://fiddler2.com/r/?fiddlercolumns for more info
-    /*
-    public static BindUIColumn("Method", 60)
-    function FillMethodColumn(oS: Session): String {
-    return oS.RequestMethod;
-    }
-    */
-
-    // The following snippet demonstrates how to create a custom tab that shows simple text
-    /*
-    public BindUITab("Flags")
-    static function FlagsReport(arrSess: Session[]):String {
-    var oSB: System.Text.StringBuilder = new System.Text.StringBuilder();
-    for (var i:int = 0; i<arrSess.Length; i++)
-    {
-    oSB.AppendLine("SESSION FLAGS");
-    oSB.AppendFormat("{0}: {1}\n", arrSess[i].id, arrSess[i].fullUrl);
-    for(var sFlag in arrSess[i].oFlags)
-    {
-    oSB.AppendFormat("\t{0}:\t\t{1}\n", sFlag.Key, sFlag.Value);
-    }
-    }
-    return oSB.ToString();
-    }
-    */
-
-    // You can create a custom menu like so:
-    /*
-    QuickLinkMenu("&Links") 
-    QuickLinkItem("IE GeoLoc TestDrive", "http://ie.microsoft.com/testdrive/HTML5/Geolocation/Default.html")
-    QuickLinkItem("FiddlerCore", "http://fiddler2.com/fiddlercore")
-    public static function DoLinksMenu(sText: String, sAction: String)
-    {
-    Utilities.LaunchHyperlink(sAction);
-    }
-    */
-
     public static RulesOption("Hide 304s")
     BindPref("fiddlerscript.rules.Hide304s")
     var m_Hide304s: boolean = false;
@@ -84,11 +12,9 @@ class Handlers
     BindPref("fiddlerscript.takubokudori.DetectToken")
     var m_DetectToken: boolean = false;
 
-    // Cause Fiddler to override the Accept-Language header with one of the defined values
     public static RulesOption("Request &Japanese Content")
     var m_Japanese: boolean = false;
 
-    // Automatic Authentication
     public static RulesOption("&Automatically Authenticate")
     BindPref("fiddlerscript.rules.AutoAuth")
     var m_AutoAuth: boolean = false;
@@ -110,9 +36,7 @@ class Handlers
     RulesStringValue(3,"picture and js and css","jpg,jpeg,gif,png,bmp,svg,ico,js,css")
     RulesStringValue(4,"Custom(Comma separated)","%CUSTOM%")
     public static var sHideExtension: String = null;
-            
-    // Cause Fiddler to override the User-Agent header with one of the defined values
-    // The page http://browserscope2.org/browse?category=selectors&ua=Mobile%20Safari is a good place to find updated versions of these
+
     RulesString("&User-Agents", true) 
     BindPref("fiddlerscript.ephemeral.UserAgentString")
     RulesStringValue(0,"Netscape &3", "Mozilla/3.0 (Win95; I)")
@@ -143,19 +67,15 @@ class Handlers
     RulesStringValue(25,"&Custom...", "%CUSTOM%")
     public static var sUA: String = null;
 
-    // Cause Fiddler to delay HTTP traffic to simulate typical 56k modem conditions
     public static RulesOption("Simulate &Modem Speeds", "Per&formance")
     var m_SimulateModem: boolean = false;
 
-    // Removes HTTP-caching related headers and specifies "no-cache" on requests and responses
     public static RulesOption("&Disable Caching", "Per&formance")
     var m_DisableCaching: boolean = false;
 
     public static RulesOption("Cache Always &Fresh", "Per&formance")
     var m_AlwaysFresh: boolean = false;
         
-    // Force a manual reload of the script file.  Resets all
-    // RulesOption variables to their defaults.
     public static ToolsAction("Reset Script")
     function DoManualReload() { 
         FiddlerObject.ReloadScript();
@@ -171,17 +91,6 @@ class Handlers
     }
 
     static function OnBeforeRequest(oSession: Session) {
-        // Sample Rule: Color ASPX requests in RED
-        // if (oSession.uriContains(".aspx")) {	oSession["ui-color"] = "red";	}
-
-        // Sample Rule: Flag POSTs to fiddler2.com in italics
-        // if (oSession.HostnameIs("www.fiddler2.com") && oSession.HTTPMethodIs("POST")) {	oSession["ui-italic"] = "yup";	}
-
-        // Sample Rule: Break requests for URLs containing "/sandbox/"
-        // if (oSession.uriContains("/sandbox/")) {
-        //     oSession.oFlags["x-breakrequest"] = "yup";	// Existence of the x-breakrequest flag creates a breakpoint; the "yup" value is unimportant.
-        // }
-
         if ((null != gs_ReplaceToken) && (oSession.url.indexOf(gs_ReplaceToken)>-1)) {   // Case sensitive
             oSession.url = oSession.url.Replace(gs_ReplaceToken, gs_ReplaceTokenWith); 
         }
@@ -202,9 +111,7 @@ class Handlers
         }
 
         if (m_SimulateModem) {
-            // Delay sends by 300ms per KB uploaded.
             oSession["request-trickle-delay"] = "300"; 
-            // Delay receives by 150ms per KB downloaded.
             oSession["response-trickle-delay"] = "150"; 
         }
 
@@ -214,7 +121,6 @@ class Handlers
             oSession.oRequest["Pragma"] = "no-cache";
         }
 
-        // User-Agent Overrides
         if (null != sUA) {
             oSession.oRequest["User-Agent"] = sUA; 
         }
@@ -224,12 +130,6 @@ class Handlers
         }
 
         if (m_AutoAuth) {
-            // Automatically respond to any authentication challenges using the 
-            // current Fiddler user's credentials. You can change (default)
-            // to a domain\\username:password string if preferred.
-            //
-            // WARNING: This setting poses a security risk if remote 
-            // connections are permitted!
             oSession["X-AutoAuth"] = "(default)";
         }
 
@@ -280,34 +180,6 @@ class Handlers
         return false;
     }
 
-
-    // This function is called immediately after a set of request headers has
-    // been read from the client. This is typically too early to do much useful
-    // work, since the body hasn't yet been read, but sometimes it may be useful.
-    //
-    // For instance, see 
-    // http://blogs.msdn.com/b/fiddler/archive/2011/11/05/http-expect-continue-delays-transmitting-post-bodies-by-up-to-350-milliseconds.aspx
-    // for one useful thing you can do with this handler.
-    //
-    // Note: oSession.requestBodyBytes is not available within this function!
-    /*
-    static function OnPeekAtRequestHeaders(oSession: Session) {
-    var sProc = ("" + oSession["x-ProcessInfo"]).ToLower();
-    if (!sProc.StartsWith("mylowercaseappname")) oSession["ui-hide"] = "NotMyApp";
-    }
-    */
-
-    //
-    // If a given session has response streaming enabled, then the OnBeforeResponse function 
-    // is actually called AFTER the response was returned to the client.
-    //
-    // In contrast, this OnPeekAtResponseHeaders function is called before the response headers are 
-    // sent to the client (and before the body is read from the server).  Hence this is an opportune time 
-    // to disable streaming (oSession.bBufferResponse = true) if there is something in the response headers 
-    // which suggests that tampering with the response body is necessary.
-    // 
-    // Note: oSession.responseBodyBytes is not available within this function!
-    //
     static function OnPeekAtResponseHeaders(oSession: Session) {
         //FiddlerApplication.Log.LogFormat("Session {0}: Response header peek shows status is {1}", oSession.id, oSession.responseCode);
         if (m_DisableCaching) {
@@ -333,18 +205,6 @@ class Handlers
         }
     }
 
-/*
-    // This function executes just before Fiddler returns an error that it has 
-    // itself generated (e.g. "DNS Lookup failure") to the client application.
-    // These responses will not run through the OnBeforeResponse function above.
-    static function OnReturningError(oSession: Session) {
-    }
-*/
-
-    // This function executes after Fiddler finishes processing a Session, regardless
-    // of whether it succeeded or failed. Note that this typically runs AFTER the last
-    // update of the Web Sessions UI listitem, so you must manually refresh the Session's
-    // UI if you intend to change it.
     static function OnDone(oSession: Session) {
     }
     static function search(header: String,body: String,searchArr: String[]){
@@ -376,57 +236,12 @@ class Handlers
         }
         return a;
     }
-            
-    /*
-    static function OnBoot() {
-        MessageBox.Show("Fiddler has finished booting");
-        System.Diagnostics.Process.Start("iexplore.exe");
 
-        UI.ActivateRequestInspector("HEADERS");
-        UI.ActivateResponseInspector("HEADERS");
-    }
-    */
-
-    /*
-    static function OnBeforeShutdown(): Boolean {
-        // Return false to cancel shutdown.
-        return ((0 == FiddlerApplication.UI.lvSessions.TotalItemCount()) ||
-                (DialogResult.Yes == MessageBox.Show("Allow Fiddler to exit?", "Go Bye-bye?",
-                 MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2)));
-    }
-    */
-
-    /*
-    static function OnShutdown() {
-            MessageBox.Show("Fiddler has shutdown");
-    }
-    */
-
-    /*
-    static function OnAttach() {
-        MessageBox.Show("Fiddler is now the system proxy");
-    }
-    */
-
-    /*
-    static function OnDetach() {
-        MessageBox.Show("Fiddler is no longer the system proxy");
-    }
-    */
-
-    // The Main() function runs everytime your FiddlerScript compiles
     static function Main() {
         var today: Date = new Date();
         FiddlerObject.StatusText = " CustomRules.js was loaded at: " + today;
-
-        // Uncomment to add a "Server" column containing the response "Server" header, if present
-        // UI.lvSessions.AddBoundColumn("Server", 50, "@response.server");
-
-        // Uncomment to add a global hotkey (Win+G) that invokes the ExecAction method below...
-        // UI.RegisterCustomHotkey(HotkeyModifiers.Windows, Keys.G, "screenshot"); 
     }
 
-    // These static variables are used for simple breakpointing & other QuickExec rules 
     BindPref("fiddlerscript.ephemeral.bpRequestURI")
     public static var bpRequestURI:String = null;
 
@@ -443,8 +258,6 @@ class Handlers
     static var gs_OverridenHost: String = null;
     static var gs_OverrideHostWith: String = null;
 
-    // The OnExecAction function is called by either the QuickExec box in the Fiddler window,
-    // or by the ExecAction.exe command line utility.
     static function OnExecAction(sParams: String[]): Boolean {
 
         FiddlerObject.StatusText = "ExecAction: " + sParams[0];
