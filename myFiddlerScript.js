@@ -20,7 +20,7 @@ class Handlers
     var m_AutoAuth: boolean = false;
         
     public static RulesOption("Always delete request cookie")
-        BindPref("fiddlerscript.ephemeral.takubokudori.AlwaysDelCookie")
+    BindPref("fiddlerscript.ephemeral.takubokudori.AlwaysDelCookie")
     var m_AlwaysDelCookie: boolean = false;
         
     RulesString("Show specified host only",true)
@@ -162,6 +162,7 @@ class Handlers
         
         if(m_AlwaysDelCookie) oSession.oRequest.headers.Remove("cookie");
         if(sShowHost!=null && !RegExp(sShowHost).test(oSession.hostname)) oSession["ui-hide"]="true";
+        if(oSession.GetRequestBodyAsString().IndexOf("action=heartbeat")!=-1) oSession["ui-hide"]="true";
     }
         
     static function separate(str: String, delimiter,fromLast: Boolean) {
@@ -173,7 +174,7 @@ class Handlers
     }
         
     static function ExistsInArray(str: String, arr:String[]){
-            str=str.ToLower();
+        str=str.ToLower();
         for(var i=0;i<arr.length;i++){
             if(str==arr[i]) return true;
         }
