@@ -7,10 +7,6 @@ class Handlers
     public static RulesOption("Hide 304s")
     BindPref("fiddlerscript.rules.Hide304s")
     var m_Hide304s: boolean = false;
-        
-    public static RulesOption("Detect token")
-    BindPref("fiddlerscript.takubokudori.DetectToken")
-    var m_DetectToken: boolean = false;
 
     public static RulesOption("Request &Japanese Content")
     var m_Japanese: boolean = false;
@@ -30,12 +26,20 @@ class Handlers
     
     // comma separated format
     RulesString("Hide extension",true)
+    BindPref("fiddlerscript.ephemeral.takubokudori.HideExtension")
     RulesStringValue(0,"picture","jpg,jpeg,gif,png,bmp,svg,ico")
     RulesStringValue(1,"js","js")
     RulesStringValue(2,"css","css")
-    RulesStringValue(3,"picture and js and css","jpg,jpeg,gif,png,bmp,svg,ico,js,css")
-    RulesStringValue(4,"Custom(Comma separated)","%CUSTOM%")
+    RulesStringValue(3,"font","woff,woff2")
+    RulesStringValue(3,"picture and js and css","jpg,jpeg,gif,png,bmp,svg,ico,js,css,woff,woff2")
+    RulesStringValue(4,"Custom","%CUSTOM%")
     public static var sHideExtension: String = null;
+	
+	
+    RulesString("Find request strings",true)
+    RulesStringValue(0,"CSRF Token","token,security,nonce,_inline_edit")
+    RulesStringValue(4,"Custom","%CUSTOM%")
+    public static var sFindRequestStrings: String = null;
 
     RulesString("&User-Agents", true) 
     BindPref("fiddlerscript.ephemeral.UserAgentString")
@@ -151,11 +155,11 @@ class Handlers
             }
         }
         
-        // detect token
-        if(m_DetectToken){
+        if(sFindRequestStrings!=null){
+            var fullMatches = sFindRequestStrings.Split(",");
             var reqh=oSession.oRequest.headers.ToString(true,true,true);
             var reqb=oSession.GetRequestBodyAsString();
-            if(search(reqh,reqb,["nonce","security","_inline_edit"])){
+            if(search(reqh,reqb,fullMatches)){
                 oSession["ui-backcolor"] = "Orange";
             }
         }
