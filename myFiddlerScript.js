@@ -94,6 +94,33 @@ class Handlers
         UI.actUpdateInspector(true,true);
     }
 
+    // Add color code
+    public static function AddColor(colorCode1: String,colorCode2: String){
+        if(colorCode1[0]!='#'||colorCode2[0]!='#') return colorCode1;
+        var k = [
+            [ 1,1,1 ],
+            [ 1,1,1 ]
+            ];
+        var cc = [colorCode1,colorCode2];
+        var t;
+        for(var i=0;i<2;i++){
+            for(var j=0;j<3;j++){
+                t = cc[i].Substring((j<<1)+1,2);
+                k[i][j] = Int32.Parse(t, System.Globalization.NumberStyles.HexNumber);
+            }
+        }
+        var nRed = k[0][0]+k[1][0];
+        var nGreen = k[0][1]+k[1][1];
+        var nBlue = k[0][2]+k[1][2];
+        return "#"+LeadingZero(nRed,2,16)+LeadingZero(nGreen,2,16)+LeadingZero(nBlue,2,16);
+    }
+        
+    static function LeadingZero(num: int,zeros: int,radix: int){
+        var zerostr="";
+        for(var i=0;i<zeros;i++) zerostr+='0';
+        return (zerostr+num.toString(radix)).slice(-zeros);
+    }
+
     static function OnBeforeRequest(oSession: Session) {
         if ((null != gs_ReplaceToken) && (oSession.url.indexOf(gs_ReplaceToken)>-1)) {   // Case sensitive
             oSession.url = oSession.url.Replace(gs_ReplaceToken, gs_ReplaceTokenWith); 
