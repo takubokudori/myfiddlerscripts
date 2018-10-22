@@ -18,6 +18,10 @@ class Handlers
     public static RulesOption("Always delete request cookie")
     BindPref("fiddlerscript.ephemeral.takubokudori.AlwaysDelCookie")
     var m_AlwaysDelCookie: boolean = false;
+    
+    public static RulesOption("Breakpoint Once")
+    BindPref("fiddlerscript.ephemeral.takubokudori.BreakpointOnce")
+    var m_bpOnce: boolean = false;
         
     RulesString("Show specified host only",true)
     RulesStringValue(0,"localhost","^(localhost|127.0.0.1)$")
@@ -141,6 +145,10 @@ class Handlers
             oSession["ui-bold"]="QuickExec";
         }
 
+        if (m_bpOnce){
+            oSession["x-breakrequest"]="once";
+            m_bpOnce=false;
+        }
         if (m_SimulateModem) {
             oSession["request-trickle-delay"] = "300"; 
             oSession["response-trickle-delay"] = "150"; 
@@ -272,7 +280,9 @@ class Handlers
     static function Main() {
         var today: Date = new Date();
         FiddlerObject.StatusText = " CustomRules.js was loaded at: " + today;
-    }
+        UI.RegisterCustomHotkey(HotkeyModifiers.Control, Keys.B, "breakonce");
+        
+        }
 
     BindPref("fiddlerscript.ephemeral.bpRequestURI")
     public static var bpRequestURI:String = null;
@@ -322,6 +332,10 @@ class Handlers
                 if (sParams.Length<2) {bpResponseURI=null; FiddlerObject.StatusText="ResponseURI breakpoint cleared"; return false;}
                 bpResponseURI = sParams[1]; 
                 FiddlerObject.StatusText="ResponseURI breakpoint for "+sParams[1];
+                return true;
+            case "breakonce":
+                m_bpOnce = !m_bpOnce;
+                FiddlerObject.StatusText = (m_bpOnce ? "Breakpoint once": "Breakpoint released");
                 return true;
             case "overridehost":
                 if (sParams.Length<3) {gs_OverridenHost=null; FiddlerObject.StatusText="Host Override cleared"; return false;}
