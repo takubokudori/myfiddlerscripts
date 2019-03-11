@@ -24,6 +24,7 @@ class Handlers
     var m_bpOnce: boolean = false;
         
     RulesString("Show specified host only",true)
+    BindPref("fiddlerscript.ephemeral.takubokudori.SpecifiedHost")
     RulesStringValue(0,"localhost","^(localhost|127.0.0.1)$")
     RulesStringValue(2,"Custom","%CUSTOM%")
     public static var sShowHost: String = null;
@@ -34,8 +35,8 @@ class Handlers
     RulesStringValue(0,"picture","jpg,jpeg,gif,png,bmp,svg,ico")
     RulesStringValue(1,"js","js")
     RulesStringValue(2,"css","css")
-    RulesStringValue(3,"font","woff,woff2")
-    RulesStringValue(3,"picture and js and css","jpg,jpeg,gif,png,bmp,svg,ico,js,css,woff,woff2")
+    RulesStringValue(3,"font","woff,woff2,ttf")
+    RulesStringValue(3,"picture and js and css","jpg,jpeg,gif,png,bmp,svg,ico,js,css,woff,woff2,ttf")
     RulesStringValue(4,"Custom","%CUSTOM%")
     public static var sHideExtension: String = null;
 	
@@ -280,7 +281,7 @@ class Handlers
     static function Main() {
         var today: Date = new Date();
         FiddlerObject.StatusText = " CustomRules.js was loaded at: " + today;
-        UI.RegisterCustomHotkey(HotkeyModifiers.Control, Keys.B, "breakonce");
+        //UI.RegisterCustomHotkey(HotkeyModifiers.Control, Keys.B, "breakonce");
         
         }
 
